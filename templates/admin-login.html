@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+
+<img src="{{ url_for('static', filename='images/VIZAG-STEEL logo.jpg') }}" class="logo">
+
+<div class="container">
+    <div class="box">
+        <h1>Admin Login</h1>
+
+        <form method="post" action="/admin-login" onsubmit="return validateLogin('hr_id')">
+
+            <label>Admin ID</label>
+            <input type="text" name="hr_id" required>
+
+            <label>Password</label>
+            <div class="password-box">
+                <input type="password" id="password" name="password" required>
+                <span class="toggle" onclick="togglePassword('password')">👁</span>
+            </div>
+
+            <a href="{{ url_for('verify_dob') }}">Forgot Password?</a>
+            {% if error %}
+            <p style="color:red; text-align:center; font-weight:bold;">
+                {{ error }}
+            </p>
+            {% endif %}
+
+
+            <button type="submit">Login</button>
+
+            <p>
+                Employee?
+                <a href="{{ url_for('login_page') }}" class="clickable">
+                    Login here
+                </a>
+            </p>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

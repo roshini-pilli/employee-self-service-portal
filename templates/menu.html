@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+</head>
+<body>
+
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/VIZAG-STEEL logo.jpg') }}" class="logo">
+
+    <div class="menu-buttons">
+        <a href="{{ url_for('menu_page', section='profile') }}">Profile</a>
+        <a href="{{ url_for('menu_page', section='contact') }}">Contact Info</a>
+        <a href="{{ url_for('menu_page', section='dependants') }}">Dependants</a>
+        <a href="{{ url_for('menu_page', section='attendance') }}">Attendance</a>
+        <a href="{{ url_for('menu_page', section='pay') }}">Pay</a>
+        <a href="{{ url_for('menu_page', section='leaves') }}">Leaves</a>
+
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="top-bar">
+        <h1>Hello, {{ name }}!</h1>
+        <div class="top-right">
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="content-area">
+
+        {% if section == 'profile' %}
+        <h2>Personal Information</h2>
+        <table>
+            <tr><th>Employee ID</th><td>{{ user.employee_id }}</td></tr>
+            <tr><th>Name</th><td>{{ user.full_name }}</td></tr>
+            <tr><th>Gender</th><td>{{ user.gender }}</td></tr>
+            <tr><th>DOB</th><td>{{ user.dob }}</td></tr>
+            <tr><th>Department</th><td>{{ user.department }}</td></tr>
+        </table>
+
+        {% elif section == 'contact' %}
+        <h2>Contact Information</h2>
+        <table>
+            <tr><th>Phone</th><td>{{ user.phone }}</td></tr>
+            <tr><th>Email</th><td>{{ user.email }}</td></tr>
+            <tr>
+                <th>Address</th>
+                <td>
+                    {{ user.address_line1 }}<br>
+                    {{ user.city }}<br>
+                    {{ user.state }} - {{ user.pincode }}<br>
+                    {{ user.country }}
+                </td>
+            </tr>
+        </table>
+
+        {% elif section == 'dependants' %}
+        <h2>Dependants</h2>
+
+        {% if show_add_form %}
+        <form method="POST" onsubmit="return validateDependantForm()">
+            {% if error %}
+                <p style="color:red">{{ error }}</p>
+            {% endif %}
+            <label>Dependant Name *</label>
+            <input type="text" name="dependant_name">
+
+            <label>Relation *</label>
+<select name="relation" id="relation"  onchange="handleRelationChange()">
+    <option value="">--Select Relation--</option>
+    <option value="Spouse">Spouse</option>
+    <option value="Father">Father</option>
+    <option value="Mother">Mother</option>
+    <option value="Father In Law">Father In Law</option>
+    <option value="Mother In Law">Mother In Law</option>
+    <option value="Child 1">Child 1</option>
+    <option value="Child 2">Child 2</option>
+
+</select>
+
+<label>Gender *</label>
+<select name="gender" id="gender">
+    <option value="">--Select Gender--</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Others">Others</option>
+</select>
+
+<label>Date of Birth *</label>
+<input type="date"
+       name="dob"
+       id="dob"
+       min="1940-01-01"
+       max="2025-12-31">
+
+
+            <button type="submit" class="add-dependant-btn">Send Request</button>
+        </form>
+        <br>
+        <a href="{{ url_for('menu_page', section='dependants') }}">← Back to Dependants</a>
+
+        {% else %}
+        <!-- Toggle Buttons -->
+<div class="toggle-buttons">
+    <button type="button" id="showDependantsBtn"
+            class="active" onclick="showDependants()">Dependants</button>
+
+    <button type="button" id="showRequestsBtn"
+            onclick="showRequests()">Requests</button>
+</div>
+
+<!-- DEPENDANTS -->
+<div id="dependantsSection">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Relation</th>
+            <th>Gender</th>
+            <th>DOB</th>
+        </tr>
+        {% for d in dependants %}
+        <tr>
+            <td>{{ d.dependant_name }}</td>
+            <td>{{ d.relation }}</td>
+            <td>{{ d.gender }}</td>
+            <td>{{ d.dob }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No dependants found</td></tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('menu_page', section='dependants', add='1') }}"
+       class="add-dependant-btn">+ Add Dependant</a>
+</div>
+
+
+<!-- REQUESTS -->
+<div id="requestsSection" style="display:none;">
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Relation</th>
+            <th>Gender</th>
+            <th>DOB</th>
+            <th>Status</th>
+            <th>Remarks</th>
+        </tr>
+
+        {% for r in dependant_requests %}
+        <tr>
+            <td>{{ r.dependant_name }}</td>
+            <td>{{ r.relation }}</td>
+            <td>{{ r.gender }}</td>
+            <td>{{ r.dob }}</td>
+
+            <td>
+                <span class="status {{ r.status|lower }}">
+                    {{ r.status }}
+                </span>
+            </td>
+
+            <td>{{ r.remarks or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">No requests found</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+        {% elif section == 'attendance' %}
+        <h2>My Attendance</h2>
+
+        <table class="attendance-table">
+            <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Total Working Days</th>
+                <th>Casual Leave</th>
+                <th>Sick Leave</th>
+                <th>Other Leave</th>
+                <th>Days Present</th>
+            </tr>
+
+            {% for a in attendance %}
+            <tr>
+                <td>{{ a.month }}</td>
+                <td>{{ a.year }}</td>
+                <td>{{ a.total_working_days }}</td>
+                <td>{{ a.casual_leave }}</td>
+                <td>{{ a.sick_leave }}</td>
+                <td>{{ a.other_leave }}</td>
+                <td><b>{{ a.days_present }}</b></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">No attendance records found</td>
+            </tr>
+            {% endfor %}
+        </table>
+    
+
+        
+
+        {% elif section == 'pay' %}
+        <h2>My Salary</h2>
+
+        <form method="get" class="filter-form">
+            <input type="hidden" name="section" value="pay">
+            <label>Month:</label>
+            <select name="month_year">
+    <option value="">All</option>
+    <option value="Jan-2025">Jan 2025</option>
+    <option value="Feb-2025">Feb 2025</option>
+    <option value="Mar-2025">Mar 2025</option>
+</select>
+
+            <button type="submit">Filter</button>
+        </form>
+
+        <table>
+            <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Gross Pay</th>
+                <th>Tax</th>
+                <th>Other Deductions</th>
+                <th>Net Pay</th>
+            </tr>
+            {% for s in salary %}
+            <tr>
+                <td>{{ s.month }}</td>
+                <td>{{ s.year }}</td>
+                <td>₹{{ s.gross_pay }}</td>
+                <td>₹{{ s.tax }}</td>
+                <td>₹{{ s.other_deductions }}</td>
+                <td><b>₹{{ s.net_pay }}</b></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No salary records</td></tr>
+            {% endfor %}
+        </table>
+        {% elif section == 'leaves' %}
+<h2>My Leave Requests</h2>
+
+<table>
+    <tr>
+        <th>Leave Date</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Remark</th>
+    </tr>
+    {% for l in leaves %}
+    <tr>
+        <td>{{ l.leave_date }}</td>
+        <td>{{ l.leave_type }}</td>
+        <td>{{ l.description }}</td>
+        <td>{{ l.status }}</td>
+        <td>{{ l.remark or '-' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No leave requests</td></tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="{{ url_for('menu_page', section='leaves', add='1') }}"
+   class="add-dependant-btn">+ New Leave Request</a>
+
+{% if show_add_form %}
+<hr>
+<h3>New Leave Request</h3>
+
+<form method="POST">
+    <label>Leave Date *</label>
+    <input type="date" name="leave_date" required>
+
+    <label>Leave Type *</label>
+    <select name="leave_type" required>
+        <option value="">--Select--</option>
+        <option value="CL">Casual Leave</option>
+        <option value="SL">Sick Leave</option>
+        <option value="OL">Other Leave</option>
+    </select>
+
+    <label>Description</label>
+    <input type="text" name="description">
+
+    <button type="submit" style="background-color: blue; color: white; height:40px;">
+    Send Request
+</button>
+
+</form>
+        {% endif %}
+
+    {% endif %}
+     
+
+    </div>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+function showDependants() {
+    document.getElementById("dependantsSection").style.display = "block";
+    document.getElementById("requestsSection").style.display = "none";
+    document.getElementById("showDependantsBtn").classList.add("active");
+    document.getElementById("showRequestsBtn").classList.remove("active");
+}
+
+function showRequests() {
+    document.getElementById("dependantsSection").style.display = "none";
+    document.getElementById("requestsSection").style.display = "block";
+    document.getElementById("showRequestsBtn").classList.add("active");
+    document.getElementById("showDependantsBtn").classList.remove("active");
+}
+</script>
+
+</body>
+</html>

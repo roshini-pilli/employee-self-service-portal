@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HR Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/VIZAG-STEEL logo.jpg') }}" class="logo">
+
+    <div class="menu-buttons">
+        <a href="{{ url_for('hr_menu', section='profile') }}">Profile</a>
+        <a href="{{ url_for('hr_menu', section='employees') }}">Employee Info</a>
+        <a href="{{ url_for('hr_menu', section='dependants') }}">Dependants</a>
+        <a href="{{ url_for('hr_menu', section='attendance') }}">Attendance</a>
+        <a href="{{ url_for('hr_menu', section='pay') }}">Pay</a>
+        <a href="{{ url_for('hr_menu', section='leaves') }}">Leaves</a>
+
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="top-bar">
+        <h1>Hello, {{ name }}!</h1>
+        <div class="top-right">
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="content-area">
+
+        {% if section == 'profile' %}
+
+        <h2>HR Profile</h2>
+        <table>
+            <tr><th>HR ID</th><td>{{ user.hr_id }}</td></tr>
+            <tr><th>Name</th><td>{{ user.full_name }}</td></tr>
+            <tr><th>Gender</th><td>{{ user.gender }}</td></tr>
+            <tr><th>DOB</th><td>{{ user.dob }}</td></tr>
+            <tr><th>Department</th><td>{{ user.department }}</td></tr>
+            <tr><th>Email</th><td>{{ user.email }}</td></tr>
+            <tr><th>Phone</th><td>{{ user.phone }}</td></tr>
+        </table>
+
+        {% elif section == 'employees' %}
+
+        <h2>Employees – {{ user.department }} Department</h2>
+        <table>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>DOB</th>
+            </tr>
+            {% for e in employees %}
+            <tr>
+                <td>{{ e.employee_id }}</td>
+                <td>{{ e.full_name }}</td>
+                <td>{{ e.gender }}</td>
+                <td>{{ e.dob }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">No employees found</td></tr>
+            {% endfor %}
+        </table>
+
+        {% elif section == 'dependants' %}
+
+        <h2>Dependants</h2>
+
+
+        <div class="toggle-buttons">
+            <button onclick="showDependants()" id="showDependantsBtn" class="active">
+                Dependants
+            </button>
+            <button onclick="showRequests()" id="showRequestsBtn">
+                Requests
+            </button>
+        </div>
+
+        <div id="dependantsView">
+            <table>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Dependant ID</th>
+                    <th>Dependant Name</th>
+                    <th>Relation</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                </tr>
+                {% for d in dependants %}
+                <tr>
+                    <td>{{ d.employee_id }}</td>
+                    <td>{{ d.full_name }}</td>
+                    <td>{{ d.dependant_id }}</td>
+                    <td>{{ d.dependant_name }}</td>
+                    <td>{{ d.relation }}</td>
+                    <td>{{ d.gender }}</td>
+                    <td>{{ d.dob }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No dependants found</td></tr>
+                {% endfor %}
+            </table>
+
+        </div>
+
+        <div id="requestsView" style="display:none;">
+            <table>
+                <tr>
+                    <th>Employee</th>
+                    <th>Dependant</th>
+                    <th>Relation</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                    <th>Action</th>
+                </tr>
+                {% for r in dependant_requests %}
+                <tr>
+                    <td>{{ r.full_name }}</td>
+                    <td>{{ r.dependant_name }}</td>
+                    <td>{{ r.relation }}</td>
+                    <td>{{ r.gender }}</td>
+                    <td>{{ r.dob }}</td>
+                    <td>
+                        <button class="approve-btn"
+                            onclick="approveRequest({{ r.request_id }})">
+                            Approve
+                        </button>
+
+                        <button class="reject-btn"
+                            onclick="rejectRequest({{ r.request_id }})">
+                            Reject
+                        </button>
+                    </td>
+
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No requests</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% elif section == 'attendance' %}
+
+        <h2 style="text-align:center;">Department Attendance</h2>
+
+        <form method="get" class="filter-form">
+            <input type="hidden" name="section" value="attendance">
+
+            <div>
+                <label>Employee ID</label>
+                <input type="text" name="emp_id" value="{{ request.args.get('emp_id','') }}">
+            </div>
+
+            <div>
+    <label>Month-Year</label>
+    <select name="month_year">
+        <option value="">All</option>
+        {% for y in [2024,2025,2026] %}
+            {% for m in ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] %}
+                <option value="{{ m }}-{{ y }}">
+                    {{ m }} {{ y }}
+                </option>
+            {% endfor %}
+        {% endfor %}
+    </select>
+</div>
+
+
+            <button type="submit">Filter</button>
+        </form>
+
+        <table>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Total Days</th>
+                <th>CL</th>
+                <th>SL</th>
+                <th>OL</th>
+                <th>Present</th>
+            </tr>
+            {% for a in attendance %}
+            <tr>
+                <td>{{ a.employee_id }}</td>
+                <td>{{ a.full_name }}</td>
+                <td>{{ a.month }}</td>
+                <td>{{ a.year }}</td>
+                <td>{{ a.total_working_days }}</td>
+                <td>{{ a.casual_leave }}</td>
+                <td>{{ a.sick_leave }}</td>
+                <td>{{ a.other_leave }}</td>
+                <td class="present">{{ a.days_present }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No attendance records</td></tr>
+            {% endfor %}
+        </table>
+
+        {% elif section == 'pay' %}
+
+        <h2>Payroll</h2>
+
+        <form method="get" class="filter-form">
+            <input type="hidden" name="section" value="pay">
+
+            <div>
+                <label>Employee ID</label>
+                <input type="text" name="employee_id"
+                    value="{{ request.args.get('employee_id','') }}">
+            </div>
+
+            <div>
+    <label>Month-Year</label>
+    <select name="month_year">
+        <option value="">All</option>
+        {% for y in [2024,2025,2026] %}
+            {% for m in ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] %}
+                <option value="{{ m }}-{{ y }}"
+                    {% if request.args.get('month_year') == m ~ '-' ~ y %}selected{% endif %}>
+                    {{ m }} {{ y }}
+                </option>
+            {% endfor %}
+        {% endfor %}
+    </select>
+</div>
+
+
+            <button type="submit">Filter</button>
+        </form>
+
+
+        <table>
+        <tr>
+            <th>Emp ID</th>
+            <th>Name</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Gross</th>
+            <th>Tax</th>
+            <th>Other Deductions</th>
+            <th>Net Pay</th>
+        </tr>
+        {% for s in salary %}
+        <tr>
+            <td>{{ s.employee_id }}</td>
+            <td>{{ s.full_name }}</td>
+            <td>{{ s.month }}</td>
+            <td>{{ s.year }}</td>
+            <td>₹{{ s.gross_pay }}</td>
+            <td>₹{{ s.tax }}</td>
+            <td>₹{{ s.other_deductions }}</td>
+            <td><b>₹{{ s.net_pay }}</b></td>
+        </tr>
+        {% endfor %}
+    </table>
+       {% elif section == 'leaves' %}
+
+        <h2>Leave Requests</h2>
+
+        <div class="toggle-buttons">
+            <button id="newLeaveBtn" class="active" onclick="showNewLeaves()">New</button>
+            <button id="processedLeaveBtn" onclick="showProcessedLeaves()">Processed</button>
+        </div>
+
+        <!-- NEW LEAVES -->
+        <div id="newLeavesSection">
+        <table>
+        <tr>
+            <th>Emp ID</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        {% for l in new_leaves %}
+        <tr>
+            <td>{{ l.employee_id }}</td>
+            <td>{{ l.leave_date }}</td>
+            <td>{{ l.leave_type }}</td>
+            <td>{{ l.description }}</td>
+            <td>
+                <button class="approve-btn"
+                        onclick="confirmApprove({{ l.leave_id }})">
+                    Approve
+                </button>
+
+                <button class="reject-btn"
+                        onclick="confirmReject({{ l.leave_id }})">
+                    Reject
+                </button>
+
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No new leave requests</td></tr>
+        {% endfor %}
+        </table>
+        </div>
+
+        <!-- PROCESSED LEAVES -->
+        <div id="processedLeavesSection" style="display:none;">
+        <table>
+        <tr>
+            <th>Emp ID</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Remark</th>
+        </tr>
+        {% for l in processed_leaves %}
+        <tr>
+            <td>{{ l.employee_id }}</td>
+            <td>{{ l.leave_date }}</td>
+            <td>{{ l.leave_type }}</td>
+            <td>{{ l.status }}</td>
+            <td>{{ l.remark or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No processed leave records</td></tr>
+        {% endfor %}
+        </table>
+        </div>
+        {% endif %}
+
+
+        <script>
+        function showNewLeaves(){
+            document.getElementById("newLeavesSection").style.display = "block";
+            document.getElementById("processedLeavesSection").style.display = "none";
+
+            document.getElementById("newLeaveBtn").classList.add("active");
+            document.getElementById("processedLeaveBtn").classList.remove("active");
+        }
+
+        function showProcessedLeaves(){
+            document.getElementById("newLeavesSection").style.display = "none";
+            document.getElementById("processedLeavesSection").style.display = "block";
+
+            document.getElementById("processedLeaveBtn").classList.add("active");
+            document.getElementById("newLeaveBtn").classList.remove("active");
+        }
+        </script>
+        <script>
+function confirmApprove(leaveId) {
+    if (confirm("Are you sure you want to accept this leave?")) {
+        window.location.href = "/approve-leave/" + leaveId;
+    }
+}
+
+function confirmReject(leaveId) {
+    if (confirm("Are you sure you want to reject this leave?")) {
+        let reason = prompt("Enter reason for rejection:");
+        if (reason && reason.trim() !== "") {
+            window.location.href =
+                "/reject-leave/" + leaveId + "?remark=" + encodeURIComponent(reason);
+        } else {
+            alert("Rejection reason is required.");
+        }
+    }
+}
+</script>
+
+
+
+
+    </div>
+</div>
+
+</body>
+</html>
