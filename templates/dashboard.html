@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESS | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .dependant-tab-content,
+        .leave-tab-content {
+            display: none !important;
+        }
+
+        .dependant-tab-content.active,
+        .leave-tab-content.active {
+            display: block !important;
+        }
+
+        .section-card-header-action {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .section-card-header-action > div {
+            flex: 1;
+        }
+
+        .compact-action-button {
+            width: auto !important;
+            min-width: 0 !important;
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .payroll-filter {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .payroll-filter .form-group {
+            margin-bottom: 0;
+            min-width: 180px;
+        }
+
+        .payroll-filter-button {
+            width: auto !important;
+            min-width: 0 !important;
+            padding: 10px 18px !important;
+            font-size: 13px !important;
+        }
+
+        .payroll-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 700px) {
+            .payroll-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .payroll-filter .form-group {
+                min-width: 0;
+            }
+
+            .payroll-filter-button {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-mark">ESS</div>
+                <div>
+                    <h2>Employee Self Service</h2>
+                    <span>Employee Portal</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-module="profile">
+                    <span>Profile</span>
+                </button>
+
+                <button class="nav-item" data-module="dependants">
+                    <span>Dependants</span>
+                </button>
+
+                <button class="nav-item" data-module="leave">
+                    <span>Leave</span>
+                </button>
+
+                <button class="nav-item" data-module="payroll">
+                    <span>Payroll</span>
+                </button>
+            </nav>
+
+            <button class="logout-button" id="logoutButton">
+                Logout
+            </button>
+        </aside>
+
+        <main class="dashboard-main">
+
+            <header class="dashboard-header">
+                <div>
+                    <h1 id="welcomeText">Hi</h1>
+                    <p>Welcome to your employee portal</p>
+                </div>
+
+                <div class="header-user" id="headerUser"></div>
+            </header>
+
+            <section class="module-section active" id="profileModule">
+                <div id="profileContent"></div>
+            </section>
+
+            <section class="module-section" id="dependantsModule">
+
+                <div class="module-tabs">
+                    <button class="module-tab active" data-dependant-tab="dependants">
+                        Dependants
+                    </button>
+
+                    <button class="module-tab" data-dependant-tab="requests">
+                        Requests
+                    </button>
+                </div>
+
+                <div class="dependant-tab-content active" id="dependantsTab">
+
+                    <div class="section-card">
+                        <div class="section-card-header section-card-header-action">
+                            <div>
+                                <h3>My Dependants</h3>
+                                <p>Approved dependant information</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="primary-button compact-action-button"
+                                id="showDependantFormButton"
+                            >
+                                Add Dependant
+                            </button>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Dependant ID</th>
+                                        <th>Name</th>
+                                        <th>Relation</th>
+                                        <th>Gender</th>
+                                        <th>DOB</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="dependantsTableBody">
+                                    <tr>
+                                        <td colspan="6" class="table-message">
+                                            Loading dependants...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div
+                        class="section-card add-dependant-card"
+                        id="dependantFormCard"
+                        style="display: none;"
+                    >
+                        <div class="section-card-header">
+                            <div>
+                                <h3>Add Dependant</h3>
+                                <p>Submit a request for a new dependant</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="cancelDependantButton"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                        <form id="dependantForm">
+
+                            <div class="form-grid">
+
+                                <div class="form-group">
+                                    <label for="dependantName">Dependant Name</label>
+                                    <input
+                                        type="text"
+                                        id="dependantName"
+                                        maxlength="100"
+                                        placeholder="Enter dependant name"
+                                    >
+                                    <span class="field-error" id="dependantNameError"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="relation">Relation</label>
+                                    <select id="relation">
+                                        <option value="">Select relation</option>
+                                    </select>
+                                    <span class="field-error" id="relationError"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dependantGender">Gender</label>
+                                    <select id="dependantGender">
+                                        <option value="">Select gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <span class="field-error" id="dependantGenderError"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dependantDob">Date of Birth</label>
+                                    <input
+                                        type="date"
+                                        id="dependantDob"
+                                    >
+                                    <span class="field-error" id="dependantDobError"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-message" id="dependantFormMessage"></div>
+
+                            <div class="form-actions">
+                                <button
+                                    type="submit"
+                                    class="primary-button"
+                                    id="submitDependantButton"
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class="dependant-tab-content" id="requestsTab">
+
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div>
+                                <h3>Dependant Requests</h3>
+                                <p>Track your submitted dependant requests</p>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Name</th>
+                                        <th>Relation</th>
+                                        <th>Gender</th>
+                                        <th>DOB</th>
+                                        <th>Status</th>
+                                        <th>Requested On</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="dependantRequestsTableBody">
+                                    <tr>
+                                        <td colspan="8" class="table-message">
+                                            Loading requests...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="module-section" id="leaveModule">
+
+                <div class="module-tabs">
+                    <button class="module-tab active" data-leave-tab="history">
+                        Leave History
+                    </button>
+
+                    <button class="module-tab" data-leave-tab="requests">
+                        Leave Requests
+                    </button>
+                </div>
+
+                <div class="leave-tab-content active" id="leaveHistoryTab">
+
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div>
+                                <h3>Leave History</h3>
+                                <p>Monthly leave summary</p>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Sick Leaves</th>
+                                        <th>Casual Leaves</th>
+                                        <th>Other Leaves</th>
+                                        <th>Total Leaves</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="leaveHistoryTableBody">
+                                    <tr>
+                                        <td colspan="5" class="table-message">
+                                            Loading leave history...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="leave-tab-content" id="leaveRequestsTab">
+
+                    <div class="section-card">
+                        <div class="section-card-header section-card-header-action">
+                            <div>
+                                <h3>Leave Requests</h3>
+                                <p>Track your submitted leave requests</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="primary-button compact-action-button"
+                                id="showLeaveFormButton"
+                            >
+                                Request Leave
+                            </button>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Leave ID</th>
+                                        <th>Leave Date</th>
+                                        <th>Leave Type</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Requested On</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="leaveRequestsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="table-message">
+                                            Loading leave requests...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div
+                        class="section-card leave-request-form-card"
+                        id="leaveFormCard"
+                        style="display: none;"
+                    >
+                        <div class="section-card-header">
+                            <div>
+                                <h3>Request Leave</h3>
+                                <p>Submit a new leave request</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="cancelLeaveButton"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                        <form id="leaveForm">
+
+                            <div class="form-grid">
+
+                                <div class="form-group">
+                                    <label for="leaveDate">Leave Date</label>
+                                    <input
+                                        type="date"
+                                        id="leaveDate"
+                                    >
+                                    <span class="field-error" id="leaveDateError"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="leaveType">Leave Type</label>
+                                    <select id="leaveType">
+                                        <option value="">Select leave type</option>
+                                        <option value="CL">Casual Leave</option>
+                                        <option value="SL">Sick Leave</option>
+                                        <option value="OL">Other Leave</option>
+                                    </select>
+                                    <span class="field-error" id="leaveTypeError"></span>
+                                </div>
+
+                                <div class="form-group form-group-full">
+                                    <label for="leaveDescription">Reason</label>
+                                    <textarea
+                                        id="leaveDescription"
+                                        maxlength="100"
+                                        rows="4"
+                                        placeholder="Enter reason for leave"
+                                    ></textarea>
+                                    <span class="field-error" id="leaveDescriptionError"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-message" id="leaveFormMessage"></div>
+
+                            <div class="form-actions">
+                                <button
+                                    type="submit"
+                                    class="primary-button"
+                                    id="submitLeaveButton"
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="module-section" id="payrollModule">
+
+                <div class="section-card">
+
+                    <div class="section-card-header">
+                        <div>
+                            <h3>Payroll</h3>
+                            <p>View your monthly salary details</p>
+                        </div>
+                    </div>
+
+                    <div class="payroll-filter">
+
+                        <div class="form-group">
+                            <label for="payrollMonth">Month</label>
+                            <select id="payrollMonth">
+                                <option value="">All Months</option>
+                                <option value="Jan">January</option>
+                                <option value="Feb">February</option>
+                                <option value="Mar">March</option>
+                                <option value="Apr">April</option>
+                                <option value="May">May</option>
+                                <option value="Jun">June</option>
+                                <option value="Jul">July</option>
+                                <option value="Aug">August</option>
+                                <option value="Sep">September</option>
+                                <option value="Oct">October</option>
+                                <option value="Nov">November</option>
+                                <option value="Dec">December</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payrollYear">Year</label>
+                            <select id="payrollYear">
+                                <option value="">All Years</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="primary-button payroll-filter-button"
+                            id="filterPayrollButton"
+                        >
+                            View
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Month</th>
+                                    <th>Gross Pay</th>
+                                    <th>Tax</th>
+                                    <th>Other Deductions</th>
+                                    <th>Net Pay</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="payrollTableBody">
+                                <tr>
+                                    <td colspan="6" class="table-message">
+                                        Loading payroll...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        class="form-message"
+                        id="payrollMessage"
+                    ></div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

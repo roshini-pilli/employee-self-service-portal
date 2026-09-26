@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESS | HR Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hr-dashboard.css') }}?v=5">
+</head>
+
+<body class="hr-dashboard-page">
+
+    <div class="hr-dashboard">
+
+        <aside class="hr-sidebar">
+
+            <div class="hr-sidebar-logo">
+                <div class="hr-logo-mark">ESS</div>
+                <div class="hr-logo-text">Employee Self Service</div>
+            </div>
+
+            <nav class="hr-nav">
+
+                <button
+                    class="hr-nav-item active"
+                    data-module="profile"
+                    type="button"
+                >
+                    <span class="hr-nav-icon">⌂</span>
+                    <span class="hr-nav-label">Profile</span>
+                </button>
+
+                <button
+                    class="hr-employees-button"
+                    id="employeesNavButton"
+                    type="button"
+                    aria-expanded="false"
+                >
+                    <span class="hr-nav-icon">▣</span>
+                    <span class="hr-nav-label">Employees</span>
+                    <span class="hr-arrow" id="employeesArrow"></span>
+                </button>
+
+                <div
+                    class="hr-submenu"
+                    id="employeesSubmenu"
+                >
+
+                    <button
+                        class="hr-subitem active"
+                        data-employee-section="details"
+                        type="button"
+                    >
+                        Details
+                    </button>
+
+                    <button
+                        class="hr-subitem"
+                        data-employee-section="dependants"
+                        type="button"
+                    >
+                        Dependants
+                    </button>
+
+                    <button
+                        class="hr-subitem"
+                        data-employee-section="leave"
+                        type="button"
+                    >
+                        Leave
+                    </button>
+
+                    <button
+                        class="hr-subitem"
+                        data-employee-section="salary"
+                        type="button"
+                    >
+                        Salary
+                    </button>
+
+                </div>
+
+                <button
+                    class="hr-nav-item"
+                    data-module="yourDependants"
+                    type="button"
+                >
+                    <span class="hr-nav-icon">♙</span>
+                    <span class="hr-nav-label">Your Dependants</span>
+                </button>
+
+                <button
+                    class="hr-nav-item"
+                    data-module="yourLeaves"
+                    type="button"
+                >
+                    <span class="hr-nav-icon">▤</span>
+                    <span class="hr-nav-label">Your Leaves</span>
+                </button>
+
+                <button
+                    class="hr-nav-item"
+                    data-module="yourPayroll"
+                    type="button"
+                >
+                    <span class="hr-nav-icon">₹</span>
+                    <span class="hr-nav-label">Your Payroll</span>
+                </button>
+
+            </nav>
+
+            <div class="hr-sidebar-bottom">
+
+                <button
+                    class="hr-nav-item hr-logout-nav-item"
+                    id="logoutButton"
+                    type="button"
+                >
+                    <span class="hr-nav-icon">↪</span>
+                    <span class="hr-nav-label">Logout</span>
+                </button>
+
+            </div>
+
+        </aside>
+
+        <main class="hr-main">
+
+            <header class="hr-topbar">
+
+                <div
+                    class="hr-welcome"
+                    id="welcomeText"
+                >
+                    Hi, Test HR
+                </div>
+
+                <div class="hr-user-area">
+
+                    <div
+                        class="hr-user-avatar"
+                        id="headerUser"
+                    >
+                        TH
+                    </div>
+
+                    <button
+                        class="hr-logout-button"
+                        id="logoutButtonTop"
+                        type="button"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </header>
+
+            <div class="hr-content">
+
+                <section
+                    class="hr-module active"
+                    id="profileModule"
+                >
+
+                    <div class="hr-card">
+
+                        <div class="hr-card-header">
+                            <div>
+                                <h2 class="hr-card-title">
+                                    Personal Information
+                                </h2>
+
+                                <p class="hr-card-subtitle">
+                                    Your HR profile information
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="hr-card-body">
+
+                            <div class="hr-profile-grid">
+
+                                <div class="hr-profile-block">
+
+                                    <div class="hr-profile-block-header">
+                                        <h3>Personal Details</h3>
+                                    </div>
+
+                                    <div class="hr-profile-details">
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                HR ID
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileHrId"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Full Name
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileFullName"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Date of Birth
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileDob"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Gender
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileGender"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Department
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileDepartment"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Role
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileRole"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="hr-profile-block">
+
+                                    <div class="hr-profile-block-header">
+                                        <h3>Contact Information</h3>
+                                    </div>
+
+                                    <div class="hr-profile-details">
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Phone
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profilePhone"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Email
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileEmail"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field full">
+                                            <span class="hr-profile-label">
+                                                Address Line 1
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileAddress1"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field full">
+                                            <span class="hr-profile-label">
+                                                Address Line 2
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileAddress2"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                City
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileCity"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                State
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileState"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Pincode
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profilePincode"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-profile-field">
+                                            <span class="hr-profile-label">
+                                                Country
+                                            </span>
+
+                                            <div
+                                                class="hr-profile-value"
+                                                id="profileCountry"
+                                            >
+                                                -
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="hr-module"
+                    id="employeesModule"
+                >
+
+                    <div
+                        class="employee-section active"
+                        id="employeeDetailsSection"
+                    >
+
+                        <div class="hr-card">
+
+                            <div class="hr-card-header">
+                                <div>
+                                    <h2 class="hr-card-title">
+                                        Employee Details
+                                    </h2>
+
+                                    <p class="hr-card-subtitle">
+                                        Employees in your department
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="hr-filter-bar">
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeDetailsId">
+                                        Employee ID
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="employeeDetailsId"
+                                        placeholder="Enter employee ID"
+                                    >
+
+                                </div>
+
+                                <button
+                                    class="hr-filter-button"
+                                    id="filterEmployeeDetailsButton"
+                                    type="button"
+                                >
+                                    Filter
+                                </button>
+
+                            </div>
+
+                            <div class="hr-table-wrapper">
+
+                                <table class="hr-table">
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Employee ID</th>
+                                            <th>Name</th>
+                                            <th>DOB</th>
+                                            <th>Gender</th>
+                                            <th>Department</th>
+                                            <th>Role</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="employeeDetailsTableBody">
+
+                                        <tr>
+                                            <td
+                                                colspan="8"
+                                                class="hr-table-message"
+                                            >
+                                                Loading employees...
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="employee-section"
+                        id="employeeDependantsSection"
+                    >
+
+                        <div class="hr-card">
+
+                            <div class="hr-card-header">
+                                <div>
+                                    <h2 class="hr-card-title">
+                                        Employee Dependants
+                                    </h2>
+
+                                    <p class="hr-card-subtitle">
+                                        Dependants of employees in your department
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="hr-filter-bar">
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeDependantsId">
+                                        Employee ID
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="employeeDependantsId"
+                                        placeholder="Enter employee ID"
+                                    >
+
+                                </div>
+
+                                <button
+                                    class="hr-filter-button"
+                                    id="filterEmployeeDependantsButton"
+                                    type="button"
+                                >
+                                    Filter
+                                </button>
+
+                            </div>
+
+                            <div class="hr-tabs">
+
+                                <button
+                                    class="hr-tab active"
+                                    data-hr-dependant-tab="dependants"
+                                    type="button"
+                                >
+                                    Dependants
+                                </button>
+
+                                <button
+                                    class="hr-tab"
+                                    data-hr-dependant-tab="requests"
+                                    type="button"
+                                >
+                                    Requests
+                                </button>
+
+                            </div>
+
+                            <div
+                                class="hr-tab-content active"
+                                id="hrDependantsTab"
+                            >
+
+                                <div class="hr-table-wrapper">
+
+                                    <table class="hr-table">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Dependant ID</th>
+                                                <th>Dependant Name</th>
+                                                <th>Relation</th>
+                                                <th>Gender</th>
+                                                <th>DOB</th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="employeeDependantsTableBody">
+
+                                            <tr>
+                                                <td
+                                                    colspan="7"
+                                                    class="hr-table-message"
+                                                >
+                                                    Loading dependants...
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="hr-tab-content"
+                                id="hrDependantRequestsTab"
+                            >
+
+                                <div class="hr-tabs">
+
+                                    <button
+                                        class="hr-tab active"
+                                        data-hr-dependant-request-tab="pending"
+                                        type="button"
+                                    >
+                                        Pending
+                                    </button>
+
+                                    <button
+                                        class="hr-tab"
+                                        data-hr-dependant-request-tab="processed"
+                                        type="button"
+                                    >
+                                        Processed
+                                    </button>
+
+                                </div>
+
+                                <div class="hr-table-wrapper">
+
+                                    <table class="hr-table">
+
+                                        <thead>
+
+                                            <tr class="dependant-pending-header">
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Dependant Name</th>
+                                                <th>Relation</th>
+                                                <th>Gender</th>
+                                                <th>DOB</th>
+                                                <th>Submitted</th>
+                                                <th>Action</th>
+                                            </tr>
+
+                                            <tr class="dependant-processed-header">
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Dependant Name</th>
+                                                <th>Relation</th>
+                                                <th>Gender</th>
+                                                <th>DOB</th>
+                                                <th>Status</th>
+                                                <th>Processed</th>
+                                                <th>HR ID</th>
+                                                <th>Remarks</th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="hrDependantRequestsTableBody">
+
+                                            <tr>
+                                                <td
+                                                    colspan="8"
+                                                    class="hr-table-message"
+                                                >
+                                                    Loading requests...
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="employee-section"
+                        id="employeeLeaveSection"
+                    >
+
+                        <div class="hr-card">
+
+                            <div class="hr-card-header">
+
+                                <div>
+
+                                    <h2 class="hr-card-title">
+                                        Employee Leave
+                                    </h2>
+
+                                    <p class="hr-card-subtitle">
+                                        Leave records of employees in your department
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <div class="hr-filter-bar">
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeLeaveId">
+                                        Employee ID
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="employeeLeaveId"
+                                        placeholder="Enter employee ID"
+                                    >
+
+                                </div>
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeLeaveMonth">
+                                        Month
+                                    </label>
+
+                                    <select id="employeeLeaveMonth">
+
+                                        <option value="">
+                                            All Months
+                                        </option>
+
+                                        <option value="Jan">Jan</option>
+                                        <option value="Feb">Feb</option>
+                                        <option value="Mar">Mar</option>
+                                        <option value="Apr">Apr</option>
+                                        <option value="May">May</option>
+                                        <option value="Jun">Jun</option>
+                                        <option value="Jul">Jul</option>
+                                        <option value="Aug">Aug</option>
+                                        <option value="Sep">Sep</option>
+                                        <option value="Oct">Oct</option>
+                                        <option value="Nov">Nov</option>
+                                        <option value="Dec">Dec</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeLeaveYear">
+                                        Year
+                                    </label>
+
+                                    <select id="employeeLeaveYear">
+
+                                        <option value="">
+                                            All Years
+                                        </option>
+
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+
+                                    </select>
+
+                                </div>
+
+                                <button
+                                    class="hr-filter-button"
+                                    id="filterEmployeeLeaveButton"
+                                    type="button"
+                                >
+                                    Filter
+                                </button>
+
+                            </div>
+
+                            <div class="hr-tabs">
+
+                                <button
+                                    class="hr-tab active"
+                                    data-hr-leave-tab="leaves"
+                                    type="button"
+                                >
+                                    Leave Records
+                                </button>
+
+                                <button
+                                    class="hr-tab"
+                                    data-hr-leave-tab="requests"
+                                    type="button"
+                                >
+                                    Requests
+                                </button>
+
+                            </div>
+
+                            <div
+                                class="hr-tab-content active"
+                                id="hrLeavesTab"
+                            >
+
+                                <div class="hr-table-wrapper">
+
+                                    <table class="hr-table">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Month</th>
+                                                <th>Year</th>
+                                                <th>Sick Leaves</th>
+                                                <th>Casual Leaves</th>
+                                                <th>Other Leaves</th>
+                                                <th>Total Leaves</th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="employeeLeaveTableBody">
+
+                                            <tr>
+                                                <td
+                                                    colspan="8"
+                                                    class="hr-table-message"
+                                                >
+                                                    Loading leave records...
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="hr-tab-content"
+                                id="hrLeaveRequestsTab"
+                            >
+
+                                <div class="hr-tabs">
+
+                                    <button
+                                        class="hr-tab active"
+                                        data-hr-leave-request-tab="pending"
+                                        type="button"
+                                    >
+                                        Pending
+                                    </button>
+
+                                    <button
+                                        class="hr-tab"
+                                        data-hr-leave-request-tab="processed"
+                                        type="button"
+                                    >
+                                        Processed
+                                    </button>
+
+                                </div>
+
+                                <div class="hr-table-wrapper">
+
+                                    <table class="hr-table">
+
+                                        <thead>
+
+                                            <tr class="leave-pending-header">
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Leave Date</th>
+                                                <th>Type</th>
+                                                <th>Reason</th>
+                                                <th>Action</th>
+                                            </tr>
+
+                                            <tr class="leave-processed-header">
+                                                <th>Employee ID</th>
+                                                <th>Employee Name</th>
+                                                <th>Leave Date</th>
+                                                <th>Type</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Processed</th>
+                                                <th>HR ID</th>
+                                                <th>Remarks</th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="hrLeaveRequestsTableBody">
+
+                                            <tr>
+                                                <td
+                                                    colspan="6"
+                                                    class="hr-table-message"
+                                                >
+                                                    Loading requests...
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="employee-section"
+                        id="employeeSalarySection"
+                    >
+
+                        <div class="hr-card">
+
+                            <div class="hr-card-header">
+
+                                <div>
+
+                                    <h2 class="hr-card-title">
+                                        Employee Salary
+                                    </h2>
+
+                                    <p class="hr-card-subtitle">
+                                        Salary details of employees in your department
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <div class="hr-filter-bar">
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeSalaryId">
+                                        Employee ID
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="employeeSalaryId"
+                                        placeholder="Enter employee ID"
+                                    >
+
+                                </div>
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeSalaryMonth">
+                                        Month
+                                    </label>
+
+                                    <select id="employeeSalaryMonth">
+
+                                        <option value="">
+                                            All Months
+                                        </option>
+
+                                        <option value="Jan">Jan</option>
+                                        <option value="Feb">Feb</option>
+                                        <option value="Mar">Mar</option>
+                                        <option value="Apr">Apr</option>
+                                        <option value="May">May</option>
+                                        <option value="Jun">Jun</option>
+                                        <option value="Jul">Jul</option>
+                                        <option value="Aug">Aug</option>
+                                        <option value="Sep">Sep</option>
+                                        <option value="Oct">Oct</option>
+                                        <option value="Nov">Nov</option>
+                                        <option value="Dec">Dec</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="hr-filter-group">
+
+                                    <label for="employeeSalaryYear">
+                                        Year
+                                    </label>
+
+                                    <select id="employeeSalaryYear">
+
+                                        <option value="">
+                                            All Years
+                                        </option>
+
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+
+                                    </select>
+
+                                </div>
+
+                                <button
+                                    class="hr-filter-button"
+                                    id="filterEmployeeSalaryButton"
+                                    type="button"
+                                >
+                                    Filter
+                                </button>
+
+                            </div>
+
+                            <div class="hr-table-wrapper">
+
+                                <table class="hr-table">
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Employee ID</th>
+                                            <th>Employee Name</th>
+                                            <th>Year</th>
+                                            <th>Month</th>
+                                            <th>Gross Pay</th>
+                                            <th>Tax</th>
+                                            <th>Other Deductions</th>
+                                            <th>Net Pay</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="employeeSalaryTableBody">
+
+                                        <tr>
+                                            <td
+                                                colspan="8"
+                                                class="hr-table-message"
+                                            >
+                                                Loading salary records...
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="hr-module"
+                    id="yourDependantsModule"
+                >
+
+                    <div class="hr-card">
+
+                        <div class="hr-card-header">
+
+                            <div>
+
+                                <h2 class="hr-card-title">
+                                    Your Dependants
+                                </h2>
+
+                                <p class="hr-card-subtitle">
+                                    Your registered dependant details
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="hr-table-wrapper">
+
+                            <table class="hr-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Dependant ID</th>
+                                        <th>Name</th>
+                                        <th>Relation</th>
+                                        <th>Gender</th>
+                                        <th>DOB</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="yourDependantsTableBody">
+
+                                    <tr>
+                                        <td
+                                            colspan="6"
+                                            class="hr-table-message"
+                                        >
+                                            Loading dependants...
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="hr-module"
+                    id="yourLeavesModule"
+                >
+
+                    <div class="hr-card">
+
+                        <div class="hr-card-header">
+
+                            <div>
+
+                                <h2 class="hr-card-title">
+                                    Your Leaves
+                                </h2>
+
+                                <p class="hr-card-subtitle">
+                                    Your monthly leave records
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="hr-table-wrapper">
+
+                            <table class="hr-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Year</th>
+                                        <th>Sick Leaves</th>
+                                        <th>Casual Leaves</th>
+                                        <th>Other Leaves</th>
+                                        <th>Total Leaves</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="yourLeaveHistoryTableBody">
+
+                                    <tr>
+                                        <td
+                                            colspan="6"
+                                            class="hr-table-message"
+                                        >
+                                            Loading leave history...
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="hr-module"
+                    id="yourPayrollModule"
+                >
+
+                    <div class="hr-card">
+
+                        <div class="hr-card-header">
+
+                            <div>
+
+                                <h2 class="hr-card-title">
+                                    Your Payroll
+                                </h2>
+
+                                <p class="hr-card-subtitle">
+                                    Your monthly salary details
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="hr-filter-bar">
+
+                            <div class="hr-filter-group">
+
+                                <label for="yourPayrollMonth">
+                                    Month
+                                </label>
+
+                                <select id="yourPayrollMonth">
+
+                                    <option value="">
+                                        All Months
+                                    </option>
+
+                                    <option value="Jan">Jan</option>
+                                    <option value="Feb">Feb</option>
+                                    <option value="Mar">Mar</option>
+                                    <option value="Apr">Apr</option>
+                                    <option value="May">May</option>
+                                    <option value="Jun">Jun</option>
+                                    <option value="Jul">Jul</option>
+                                    <option value="Aug">Aug</option>
+                                    <option value="Sep">Sep</option>
+                                    <option value="Oct">Oct</option>
+                                    <option value="Nov">Nov</option>
+                                    <option value="Dec">Dec</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="hr-filter-group">
+
+                                <label for="yourPayrollYear">
+                                    Year
+                                </label>
+
+                                <select id="yourPayrollYear">
+
+                                    <option value="">
+                                        All Years
+                                    </option>
+
+                                    <option value="2026">2026</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+
+                                </select>
+
+                            </div>
+
+                            <button
+                                class="hr-filter-button"
+                                id="filterYourPayrollButton"
+                                type="button"
+                            >
+                                Filter
+                            </button>
+
+                        </div>
+
+                        <div class="hr-table-wrapper">
+
+                            <table class="hr-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Year</th>
+                                        <th>Month</th>
+                                        <th>Gross Pay</th>
+                                        <th>Tax</th>
+                                        <th>Other Deductions</th>
+                                        <th>Net Pay</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="yourPayrollTableBody">
+
+                                    <tr>
+                                        <td
+                                            colspan="6"
+                                            class="hr-table-message"
+                                        >
+                                            Loading payroll...
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/hr-dashboard.js') }}?v=5"></script>
+
+</body>
+</html>
