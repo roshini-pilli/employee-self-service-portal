@@ -36,6 +36,11 @@ const leaveTabContents = document.querySelectorAll(".leave-tab-content");
 const leaveHistoryTableBody = document.getElementById("leaveHistoryTableBody");
 const leaveRequestsTableBody = document.getElementById("leaveRequestsTableBody");
 
+const leaveHistoryMonth = document.getElementById("leaveHistoryMonth");
+const leaveHistoryYear = document.getElementById("leaveHistoryYear");
+const filterLeaveHistoryButton = document.getElementById("filterLeaveHistoryButton");
+const resetLeaveHistoryButton = document.getElementById("resetLeaveHistoryButton");
+
 const leaveForm = document.getElementById("leaveForm");
 const leaveFormCard = document.getElementById("leaveFormCard");
 const showLeaveFormButton = document.getElementById("showLeaveFormButton");
@@ -57,6 +62,8 @@ const payrollYear = document.getElementById("payrollYear");
 const filterPayrollButton = document.getElementById("filterPayrollButton");
 const payrollTableBody = document.getElementById("payrollTableBody");
 const payrollMessage = document.getElementById("payrollMessage");
+
+let leaveHistoryData = [];
 
 function escapeHtml(value) {
     if (value === null || value === undefined || value === "") {
@@ -89,21 +96,27 @@ function formatDate(value) {
     });
 }
 
-function formatMonthYear(value) {
+function formatMonth(value) {
     if (!value) {
         return "—";
     }
 
-    const date = new Date(`${value}T00:00:00`);
+    const monthMap = {
+        Jan: "January",
+        Feb: "February",
+        Mar: "March",
+        Apr: "April",
+        May: "May",
+        Jun: "June",
+        Jul: "July",
+        Aug: "August",
+        Sep: "September",
+        Oct: "October",
+        Nov: "November",
+        Dec: "December"
+    };
 
-    if (Number.isNaN(date.getTime())) {
-        return value;
-    }
-
-    return date.toLocaleDateString("en-IN", {
-        month: "long",
-        year: "numeric"
-    });
+    return monthMap[value] || value;
 }
 
 function formatAmount(value) {
@@ -163,16 +176,38 @@ function displayProfile(employee) {
     `;
 }
 
+async function checkAuthentication() {
+    try {
+        const response = await fetch("/api/employee/profile", {
+            method: "GET",
+            cache: "no-store",
+            credentials: "same-origin"
+        });
+
+        if (response.status === 401) {
+            window.location.replace("/login");
+            return false;
+        }
+
+        return response.ok;
+    } catch (error) {
+        return true;
+    }
+}
+
 async function loadProfile() {
     profileContent.innerHTML = `
         <div class="loading-state">Loading profile...</div>
     `;
 
     try {
-        const response = await fetch("/api/employee/profile");
+        const response = await fetch("/api/employee/profile", {
+            cache: "no-store",
+            credentials: "same-origin"
+        });
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -199,10 +234,16 @@ async function loadProfile() {
 
 async function loadRelations() {
     try {
-        const response = await fetch("/api/employee/dependants/relations");
+        const response = await fetch(
+            "/api/employee/dependants/relations",
+            {
+                cache: "no-store",
+                credentials: "same-origin"
+            }
+        );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -239,10 +280,16 @@ async function loadDependants() {
     `;
 
     try {
-        const response = await fetch("/api/employee/dependants");
+        const response = await fetch(
+            "/api/employee/dependants",
+            {
+                cache: "no-store",
+                credentials: "same-origin"
+            }
+        );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -313,10 +360,16 @@ async function loadDependantRequests() {
     `;
 
     try {
-        const response = await fetch("/api/employee/dependants/requests");
+        const response = await fetch(
+            "/api/employee/dependants/requests",
+            {
+                cache: "no-store",
+                credentials: "same-origin"
+            }
+        );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -523,6 +576,7 @@ async function submitDependantRequest(event) {
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: "same-origin",
                 body: JSON.stringify({
                     dependant_name: dependantName.value.trim(),
                     relation_id: Number(relation.value),
@@ -533,7 +587,7 @@ async function submitDependantRequest(event) {
         );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -669,11 +723,23 @@ function createLeaveSummary(leaves) {
         if (!summaries[monthKey]) {
             summaries[monthKey] = {
                 monthKey,
+                month: "",
+                year: "",
                 sick: 0,
                 casual: 0,
                 other: 0
             };
         }
+
+        const date = new Date(`${monthKey}-01T00:00:00`);
+
+        summaries[monthKey].month =
+            date.toLocaleDateString("en-IN", {
+                month: "long"
+            });
+
+        summaries[monthKey].year =
+            date.getFullYear();
 
         if (item.status === "APPROVED") {
             if (item.leave_type === "SL") {
@@ -695,20 +761,120 @@ function createLeaveSummary(leaves) {
     );
 }
 
+function displayLeaveHistory(summaries) {
+    if (!summaries || summaries.length === 0) {
+        leaveHistoryTableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="table-message">
+                    No approved leave history found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    const selectedMonth = leaveHistoryMonth
+        ? leaveHistoryMonth.value
+        : "";
+
+    const selectedYear = leaveHistoryYear
+        ? leaveHistoryYear.value
+        : "";
+
+    const filteredSummaries = summaries.filter((item) => {
+        let monthMatches = true;
+        let yearMatches = true;
+
+        if (selectedMonth) {
+            const monthDate = new Date(
+                `${item.monthKey}-01T00:00:00`
+            );
+
+            const monthNumber = String(
+                monthDate.getMonth() + 1
+            ).padStart(2, "0");
+
+            const selectedMonthNumber =
+                String(
+                    [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec"
+                    ].indexOf(selectedMonth) + 1
+                ).padStart(2, "0");
+
+            monthMatches =
+                monthNumber === selectedMonthNumber;
+        }
+
+        if (selectedYear) {
+            yearMatches =
+                String(item.year) === String(selectedYear);
+        }
+
+        return monthMatches && yearMatches;
+    });
+
+    if (filteredSummaries.length === 0) {
+        leaveHistoryTableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="table-message">
+                    No leave history found for the selected filter.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    leaveHistoryTableBody.innerHTML =
+        filteredSummaries.map((item) => {
+            const total =
+                item.sick +
+                item.casual +
+                item.other;
+
+            return `
+                <tr>
+                    <td>${escapeHtml(item.month)}</td>
+                    <td>${escapeHtml(item.year)}</td>
+                    <td>${item.sick}</td>
+                    <td>${item.casual}</td>
+                    <td>${item.other}</td>
+                    <td>${total}</td>
+                </tr>
+            `;
+        }).join("");
+}
+
 async function loadLeaveHistory() {
     leaveHistoryTableBody.innerHTML = `
         <tr>
-            <td colspan="5" class="table-message">
+            <td colspan="6" class="table-message">
                 Loading leave history...
             </td>
         </tr>
     `;
 
     try {
-        const response = await fetch("/api/leave/history");
+        const response = await fetch(
+            "/api/leave/history",
+            {
+                cache: "no-store",
+                credentials: "same-origin"
+            }
+        );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -717,7 +883,7 @@ async function loadLeaveHistory() {
         if (!response.ok) {
             leaveHistoryTableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="table-message">
+                    <td colspan="6" class="table-message">
                         ${escapeHtml(
                             data.message ||
                             "Unable to load leave history"
@@ -731,7 +897,7 @@ async function loadLeaveHistory() {
         if (!data.leaves || data.leaves.length === 0) {
             leaveHistoryTableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="table-message">
+                    <td colspan="6" class="table-message">
                         No leave history found.
                     </td>
                 </tr>
@@ -739,43 +905,14 @@ async function loadLeaveHistory() {
             return;
         }
 
-        const summaries = createLeaveSummary(data.leaves);
+        leaveHistoryData =
+            createLeaveSummary(data.leaves);
 
-        if (summaries.length === 0) {
-            leaveHistoryTableBody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="table-message">
-                        No approved leave history found.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        leaveHistoryTableBody.innerHTML =
-            summaries.map((item) => {
-                const total =
-                    item.sick +
-                    item.casual +
-                    item.other;
-
-                const firstDate =
-                    `${item.monthKey}-01`;
-
-                return `
-                    <tr>
-                        <td>${formatMonthYear(firstDate)}</td>
-                        <td>${item.sick}</td>
-                        <td>${item.casual}</td>
-                        <td>${item.other}</td>
-                        <td>${total}</td>
-                    </tr>
-                `;
-            }).join("");
+        displayLeaveHistory(leaveHistoryData);
     } catch (error) {
         leaveHistoryTableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="table-message">
+                <td colspan="6" class="table-message">
                     Unable to connect to the server.
                 </td>
             </tr>
@@ -793,10 +930,16 @@ async function loadLeaveRequests() {
     `;
 
     try {
-        const response = await fetch("/api/leave/history");
+        const response = await fetch(
+            "/api/leave/history",
+            {
+                cache: "no-store",
+                credentials: "same-origin"
+            }
+        );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -874,6 +1017,7 @@ async function submitLeaveRequest(event) {
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: "same-origin",
                 body: JSON.stringify({
                     leave_date: leaveDate.value,
                     leave_type: leaveType.value,
@@ -883,7 +1027,7 @@ async function submitLeaveRequest(event) {
         );
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -951,10 +1095,13 @@ async function loadPayroll() {
             ? `/api/payroll/employee?${queryString}`
             : "/api/payroll/employee";
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            cache: "no-store",
+            credentials: "same-origin"
+        });
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
 
@@ -1181,6 +1328,26 @@ filterPayrollButton.addEventListener(
     loadPayroll
 );
 
+if (filterLeaveHistoryButton) {
+    filterLeaveHistoryButton.addEventListener(
+        "click",
+        () => {
+            displayLeaveHistory(leaveHistoryData);
+        }
+    );
+}
+
+if (resetLeaveHistoryButton) {
+    resetLeaveHistoryButton.addEventListener(
+        "click",
+        () => {
+            leaveHistoryMonth.value = "";
+            leaveHistoryYear.value = "";
+            displayLeaveHistory(leaveHistoryData);
+        }
+    );
+}
+
 relation.addEventListener("change", () => {
     const relationId = Number(relation.value);
 
@@ -1234,10 +1401,35 @@ logoutButton.addEventListener("click", async () => {
 
     try {
         await fetch("/api/auth/logout", {
-            method: "POST"
+            method: "POST",
+            credentials: "same-origin",
+            cache: "no-store"
         });
     } finally {
-        window.location.href = "/login";
+        sessionStorage.setItem("essLoggedOut", "true");
+        window.location.replace("/login");
+    }
+});
+
+window.addEventListener("pageshow", async (event) => {
+    if (sessionStorage.getItem("essLoggedOut") === "true") {
+        sessionStorage.removeItem("essLoggedOut");
+
+        const authenticated = await checkAuthentication();
+
+        if (!authenticated) {
+            window.location.replace("/login");
+        }
+
+        return;
+    }
+
+    if (event.persisted) {
+        const authenticated = await checkAuthentication();
+
+        if (!authenticated) {
+            window.location.replace("/login");
+        }
     }
 });
 
