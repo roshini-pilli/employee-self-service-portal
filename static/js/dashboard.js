@@ -273,7 +273,7 @@ async function loadRelations() {
 async function loadDependants() {
     dependantsTableBody.innerHTML = `
         <tr>
-            <td colspan="6" class="table-message">
+            <td colspan="5" class="table-message">
                 Loading dependants...
             </td>
         </tr>
@@ -298,7 +298,7 @@ async function loadDependants() {
         if (!response.ok) {
             dependantsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="table-message">
+                    <td colspan="5" class="table-message">
                         ${escapeHtml(data.message || "Unable to load dependants")}
                     </td>
                 </tr>
@@ -309,7 +309,7 @@ async function loadDependants() {
         if (!data.dependants || data.dependants.length === 0) {
             dependantsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="table-message">
+                    <td colspan="5" class="table-message">
                         No approved dependants found.
                     </td>
                 </tr>
@@ -319,7 +319,6 @@ async function loadDependants() {
 
         dependantsTableBody.innerHTML = data.dependants.map((item) => `
             <tr>
-                
                 <td>${escapeHtml(item.dependant_id)}</td>
                 <td>${escapeHtml(item.dependant_name)}</td>
                 <td>${escapeHtml(item.relation_name)}</td>
@@ -353,7 +352,7 @@ function getStatusClass(status) {
 async function loadDependantRequests() {
     dependantRequestsTableBody.innerHTML = `
         <tr>
-            <td colspan="5" class="table-message">
+            <td colspan="7" class="table-message">
                 Loading requests...
             </td>
         </tr>
@@ -378,7 +377,7 @@ async function loadDependantRequests() {
         if (!response.ok) {
             dependantRequestsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="table-message">
+                    <td colspan="7" class="table-message">
                         ${escapeHtml(data.message || "Unable to load requests")}
                     </td>
                 </tr>
@@ -399,7 +398,6 @@ async function loadDependantRequests() {
 
         dependantRequestsTableBody.innerHTML = data.requests.map((item) => `
             <tr>
-                
                 <td>${escapeHtml(item.dependant_name)}</td>
                 <td>${escapeHtml(item.relation_name)}</td>
                 <td>${escapeHtml(item.gender)}</td>
@@ -973,7 +971,6 @@ async function loadLeaveRequests() {
         leaveRequestsTableBody.innerHTML =
             data.leaves.map((item) => `
                 <tr>
-                    
                     <td>${formatDate(item.leave_date)}</td>
                     <td>${escapeHtml(item.leave_type)}</td>
                     <td>${escapeHtml(item.description)}</td>
