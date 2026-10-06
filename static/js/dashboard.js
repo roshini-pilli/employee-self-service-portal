@@ -319,7 +319,7 @@ async function loadDependants() {
 
         dependantsTableBody.innerHTML = data.dependants.map((item) => `
             <tr>
-                <td>${escapeHtml(item.employee_id)}</td>
+                
                 <td>${escapeHtml(item.dependant_id)}</td>
                 <td>${escapeHtml(item.dependant_name)}</td>
                 <td>${escapeHtml(item.relation_name)}</td>
@@ -330,7 +330,7 @@ async function loadDependants() {
     } catch (error) {
         dependantsTableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="table-message">
+                <td colspan="5" class="table-message">
                     Unable to connect to the server.
                 </td>
             </tr>
@@ -353,7 +353,7 @@ function getStatusClass(status) {
 async function loadDependantRequests() {
     dependantRequestsTableBody.innerHTML = `
         <tr>
-            <td colspan="8" class="table-message">
+            <td colspan="5" class="table-message">
                 Loading requests...
             </td>
         </tr>
@@ -389,7 +389,7 @@ async function loadDependantRequests() {
         if (!data.requests || data.requests.length === 0) {
             dependantRequestsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="table-message">
+                    <td colspan="7" class="table-message">
                         No dependant requests found.
                     </td>
                 </tr>
@@ -399,7 +399,7 @@ async function loadDependantRequests() {
 
         dependantRequestsTableBody.innerHTML = data.requests.map((item) => `
             <tr>
-                <td>${escapeHtml(item.request_id)}</td>
+                
                 <td>${escapeHtml(item.dependant_name)}</td>
                 <td>${escapeHtml(item.relation_name)}</td>
                 <td>${escapeHtml(item.gender)}</td>
@@ -416,7 +416,7 @@ async function loadDependantRequests() {
     } catch (error) {
         dependantRequestsTableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="table-message">
+                <td colspan="7" class="table-message">
                     Unable to connect to the server.
                 </td>
             </tr>
@@ -923,7 +923,7 @@ async function loadLeaveHistory() {
 async function loadLeaveRequests() {
     leaveRequestsTableBody.innerHTML = `
         <tr>
-            <td colspan="7" class="table-message">
+            <td colspan="6" class="table-message">
                 Loading leave requests...
             </td>
         </tr>
@@ -948,7 +948,7 @@ async function loadLeaveRequests() {
         if (!response.ok) {
             leaveRequestsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="table-message">
+                    <td colspan="6" class="table-message">
                         ${escapeHtml(
                             data.message ||
                             "Unable to load leave requests"
@@ -962,7 +962,7 @@ async function loadLeaveRequests() {
         if (!data.leaves || data.leaves.length === 0) {
             leaveRequestsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="table-message">
+                    <td colspan="6" class="table-message">
                         No leave requests found.
                     </td>
                 </tr>
@@ -973,7 +973,7 @@ async function loadLeaveRequests() {
         leaveRequestsTableBody.innerHTML =
             data.leaves.map((item) => `
                 <tr>
-                    <td>${escapeHtml(item.leave_id)}</td>
+                    
                     <td>${formatDate(item.leave_date)}</td>
                     <td>${escapeHtml(item.leave_type)}</td>
                     <td>${escapeHtml(item.description)}</td>
@@ -989,7 +989,7 @@ async function loadLeaveRequests() {
     } catch (error) {
         leaveRequestsTableBody.innerHTML = `
             <tr>
-                <td colspan="7" class="table-message">
+                <td colspan="6" class="table-message">
                     Unable to connect to the server.
                 </td>
             </tr>
