@@ -91,7 +91,14 @@ def employee_login():
             "must_reset_password": False
         })
 
-    except mysql.connector.Error:
+    except mysql.connector.Error as e:
+        print("EMPLOYEE LOGIN MYSQL ERROR:", repr(e), flush=True)
+        return jsonify({
+            "message": "Server error"
+        }), 500
+
+    except Exception as e:
+        print("EMPLOYEE LOGIN ERROR:", repr(e), flush=True)
         return jsonify({
             "message": "Server error"
         }), 500
@@ -178,7 +185,14 @@ def hr_login():
             "must_reset_password": False
         })
 
-    except mysql.connector.Error:
+    except mysql.connector.Error as e:
+        print("HR LOGIN MYSQL ERROR:", repr(e), flush=True)
+        return jsonify({
+            "message": "Server error"
+        }), 500
+
+    except Exception as e:
+        print("HR LOGIN ERROR:", repr(e), flush=True)
         return jsonify({
             "message": "Server error"
         }), 500
